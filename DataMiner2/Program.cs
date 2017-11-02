@@ -27,14 +27,15 @@ namespace DataMiner2
             taskParams.Delta = Int32.Parse(setINI.GetPrivateString("TASKS","Delta","1"));
             taskParams.SetStartDate(setINI.GetPrivateString("TASKS","Startdate","2017-01-01"));
             WFContext wfContext = new WFContext(taskParams.DB2ConnectionString);
-            //проверка даты начала отбора с текущим днем
+            //проверка даты начала отбора с текущим днем, часом, минутой и т.п )))
             DateTime dt = DateTime.Now;
             dt = dt > taskParams.StartDateTime ? taskParams.StartDateTime : dt;
             // выборка TASKS из ПФР
             List<Task> newTask = wfContext.GetDeltaTasks(dt, taskParams.Delta, taskParams.Department);
             // подсчитываем результат выборки из БД "ЗАДАЧИ"
             if (newTask.Count() > 0)
-            {
+            {//здесь данные пойдут в БД Инфоцентр
+
 
             }else   //ничего не выбрано в БД ПФР
             {
@@ -50,7 +51,7 @@ namespace DataMiner2
             setINI.WritePrivateString("TASKS", "Delta", taskParams.Delta.ToString());
             setINI.WritePrivateString("TASKS","Startdate",taskParams.GetStartDate());
             setINI.WritePrivateString("MYSQL", "ConnectStr", taskParams.MySQLConnectionString);
-
+            Log.wi(DateTime.Now, "Завершаем программу", String.Format("Нач.дата следующей выборки:{0}", taskParams.GetStartDate()));
         }
 }
 }
