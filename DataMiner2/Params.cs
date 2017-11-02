@@ -9,8 +9,9 @@ namespace DataMiner2
     public class Params
     {
         private DateTime startDate;
-        public string ConnectionString { get; set; }
-        
+        public string DB2ConnectionString { get; set; }
+        public string MySQLConnectionString { get; set; }
+
         public int Delta { get; set; }
         public int Department { get; set; }
 
@@ -21,6 +22,11 @@ namespace DataMiner2
         public void SetStartDate(string sd)
         {
             startDate = Convert.ToDateTime(sd);
+        }
+
+        public DateTime StartDateTime {
+            get { return startDate; }
+            set { startDate = value; }
         }
     }
 }

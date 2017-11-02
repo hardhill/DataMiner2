@@ -15,23 +15,41 @@ namespace DataMiner2
         static void Main(string[] args)
         {
             List<Task> lstTasks = new List<Task>();
-            Params wfParams = new Params();
+            Params taskParams = new Params();
             Log.w("================================== START ver. 171102-1 =======================================");
             INIManager setINI = new INIManager();
             
             setINI.Path = Path.GetDirectoryName(AppContext.BaseDirectory) + @"\dataminer2.ini";
             
-            wfParams.ConnectionString = setINI.GetPrivateString("DB2", "ConnectStr", "Driver ={ IBM DB2 ODBC DRIVER}; Database = WF; Hostname = 10.3.30.135; Port = 50666; Protocol = TCPIP; Uid = wfuser; Pwd = wfuser017;");
-            wfParams.Department = Int32.Parse(setINI.GetPrivateString("DB2","Department", "35"));
-            wfParams.Delta = Int32.Parse(setINI.GetPrivateString("DB2","Delta","1"));
-            wfParams.SetStartDate(setINI.GetPrivateString("DB2","Startdate","2017-01-01"));
-            //WFContext wfContext = new WFContext(wfParams.ConnectionString);
+            taskParams.DB2ConnectionString = setINI.GetPrivateString("DB2", "ConnectStr", "Driver ={ IBM DB2 ODBC DRIVER}; Database = WF; Hostname = 10.3.30.135; Port = 50666; Protocol = TCPIP; Uid = wfuser; Pwd = wfuser017;");
+            taskParams.MySQLConnectionString = setINI.GetPrivateString("MYSQL", "ConnectStr", "Database=infocenter;Data Source=localhost;User Id=icadmin;Password=Inf0Center");
+            taskParams.Department = Int32.Parse(setINI.GetPrivateString("DB2","Department", "35"));
+            taskParams.Delta = Int32.Parse(setINI.GetPrivateString("TASKS","Delta","1"));
+            taskParams.SetStartDate(setINI.GetPrivateString("TASKS","Startdate","2017-01-01"));
+            WFContext wfContext = new WFContext(taskParams.DB2ConnectionString);
+            //проверка даты начала отбора с текущим днем
+            DateTime dt = DateTime.Now;
+            dt = dt > taskParams.StartDateTime ? taskParams.StartDateTime : dt;
+            // выборка TASKS из ПФР
+            List<Task> newTask = wfContext.GetDeltaTasks(dt, taskParams.Delta, taskParams.Department);
+            // подсчитываем результат выборки из БД "ЗАДАЧИ"
+            if (newTask.Count() > 0)
+            {
+
+            }else   //ничего не выбрано в БД ПФР
+            {
+                // увеличиваем на Н-дней начальную дату отбора
+                DateTime newDate = taskParams.StartDateTime.AddDays(taskParams.Delta);
+                //сохраняем в параметр
+                taskParams.StartDateTime = newDate;
+            }
 
 //c сохранение параметров
-            setINI.WritePrivateString("DB2", "ConnectStr", wfParams.ConnectionString);
-            setINI.WritePrivateString("DB2", "Department", wfParams.Department.ToString());
-            setINI.WritePrivateString("DB2", "Delta", wfParams.Delta.ToString());
-            setINI.WritePrivateString("DB2","Startdate",wfParams.GetStartDate());
+            setINI.WritePrivateString("DB2", "ConnectStr", taskParams.DB2ConnectionString);
+            setINI.WritePrivateString("DB2", "Department", taskParams.Department.ToString());
+            setINI.WritePrivateString("TASKS", "Delta", taskParams.Delta.ToString());
+            setINI.WritePrivateString("TASKS","Startdate",taskParams.GetStartDate());
+            setINI.WritePrivateString("MYSQL", "ConnectStr", taskParams.MySQLConnectionString);
 
         }
 }

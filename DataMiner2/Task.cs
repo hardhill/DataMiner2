@@ -15,8 +15,8 @@ namespace DataMiner2
         public int? Id_stage_from { get; set; }
         public int? Type_transaction { get; set; }
         public DateTime Dateofcomming { get; set; }
-        public DateTime? Dateoftaking { get; set; }
-        public DateTime? Dateofcomlation { get; set; }
+        public DateTime Dateoftaking { get; set; }
+        public DateTime Dateofcomlation { get; set; }
         public string Id_user { get; set; }
         public int? Type_complation { get; set; }
         public int Id_department { get; set; }

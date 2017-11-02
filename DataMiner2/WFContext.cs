@@ -34,45 +34,53 @@ namespace DataMiner2
                     conn.Open();
                     string sql = String.Format("SELECT * FROM DB2ADMIN.TASKS T1 WHERE (DATE(T1.DATEOFCOMMING)>='{0}')AND(DATE(T1.DATEOFCOMMING)<='{1}')AND(T1.ID_DEPARTMENT={2})", start, finish, department);
                     OdbcCommand comGetTasks = new OdbcCommand(sql, conn);
-                    using (OdbcDataReader readTask = comGetTasks.ExecuteReader())
+                    try
                     {
-                        while (readTask.Read())
+                        using (OdbcDataReader readTask = comGetTasks.ExecuteReader())
                         {
-                            Task task = new Task();
-                            task.Id_task = (readTask.IsDBNull(0)) ? 0 : readTask.GetInt64(0);
-                            task.Id_type_process = readTask.IsDBNull(1) ? 0 : readTask.GetInt64(1);
-                            task.Id_process = readTask.IsDBNull(2) ? 0 : readTask.GetInt64(2);
-                            task.Id_stage_to = readTask.IsDBNull(3) ? 0 : readTask.GetInt32(3);
-                            task.Id_stage_from = readTask.IsDBNull(4) ? 0 : readTask.GetInt32(4);
-                            task.Type_transaction = readTask.IsDBNull(5) ? 0 : readTask.GetInt32(5);
-                            if (!readTask.IsDBNull(6))
+                            while (readTask.Read())
                             {
-                                task.Dateofcomming = readTask.GetDateTime(6);
+                                Task task = new Task();
+                                task.Id_task = (readTask.IsDBNull(0)) ? 0 : readTask.GetInt64(0);
+                                task.Id_type_process = readTask.IsDBNull(1) ? 0 : readTask.GetInt64(1);
+                                task.Id_process = readTask.IsDBNull(2) ? 0 : readTask.GetInt64(2);
+                                task.Id_stage_to = readTask.IsDBNull(3) ? 0 : readTask.GetInt32(3);
+                                task.Id_stage_from = readTask.IsDBNull(4) ? 0 : readTask.GetInt32(4);
+                                task.Type_transaction = readTask.IsDBNull(5) ? 0 : readTask.GetInt32(5);
+                                if (!readTask.IsDBNull(6))
+                                {
+                                    task.Dateofcomming = readTask.GetDateTime(6);
+                                }
+                                if (!readTask.IsDBNull(7))
+                                {
+                                    task.Dateoftaking = readTask.GetDateTime(7);
+                                }
+                                else task.Dateoftaking = DateTime.MinValue;
+                                if (!readTask.IsDBNull(8))
+                                {
+                                    task.Dateofcomlation = readTask.GetDateTime(8);
+                                }
+                                else task.Dateofcomming = DateTime.MinValue;
+                                if (!readTask.IsDBNull(9))
+                                {
+                                    task.Id_user = readTask.GetString(9);
+                                }
+                                if (!readTask.IsDBNull(10))
+                                {
+                                    task.Type_complation = readTask.GetInt32(10);
+                                }
+                                task.Id_department = readTask.GetInt32(13);
+                                list.Add(task);
                             }
-                            if (!readTask.IsDBNull(7))
-                            {
-                                task.Dateoftaking = readTask.GetDateTime(7);
-                            }
-                            if (!readTask.IsDBNull(8))
-                            {
-                                task.Dateofcomlation = readTask.GetDateTime(8);
-                            }
-                            if (!readTask.IsDBNull(9))
-                            {
-                                task.Id_user = readTask.GetString(9);
-                            }
-                            if (!readTask.IsDBNull(10))
-                            {
-                                task.Type_complation = readTask.GetInt32(10);
-                            }
-                            task.Id_department = readTask.GetInt32(13);
-                            list.Add(task);
                         }
+                    }catch(Exception e)
+                    {
+                        Log.we(DateTime.Now, "Выполнение запроса в ПФР<TASKS>", e.Message);
                     }
                 }
-                finally
+                catch(Exception e)
                 {
-                    conn.Close();
+                    Log.we(DateTime.Now, "Соединение с БД ПФР", e.Message);
 
                 }
             }
