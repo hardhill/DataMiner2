@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMiner2", "DataMiner2\DataMiner2.csproj", "{2FEE59F3-C7D9-475A-A90C-9219A9FCC010}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMiner3", "DataMiner3\DataMiner3.csproj", "{C233F617-A8A0-45D1-A240-95B67CB7B3E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2FEE59F3-C7D9-475A-A90C-9219A9FCC010}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FEE59F3-C7D9-475A-A90C-9219A9FCC010}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FEE59F3-C7D9-475A-A90C-9219A9FCC010}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C233F617-A8A0-45D1-A240-95B67CB7B3E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C233F617-A8A0-45D1-A240-95B67CB7B3E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C233F617-A8A0-45D1-A240-95B67CB7B3E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C233F617-A8A0-45D1-A240-95B67CB7B3E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

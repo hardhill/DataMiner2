@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.Odbc;
 
-namespace DataMiner2
+namespace DataMiner3
 {
     class WFContext
     {
@@ -21,18 +21,41 @@ namespace DataMiner2
             return new OdbcConnection(ConnectionString);
         }
 
-        public List<Task> GetDeltaTasks(DateTime startDate, int deltaDay, int department)
+        public List<Task> GetTasksForUpdate(List<long> listId)
         {
-            DateTime d = startDate.AddDays(deltaDay);
-            string start = startDate.ToString(DATEFORMAT);
-            string finish = d.ToString(DATEFORMAT);
-            List<Task> list = new List<Task>();
+            List<Task> lstTask = new List<Task>();
+            foreach(long idtask in listId)
+            {
+                using(OdbcConnection conn = GetConnection())
+                {
+                    try
+                    {
+                        string sql = String.Format("SELECT T1.* FROM DB2ADMIN.TASKS as T1 WHERE (T1.ID_TASK = {0})AND(T1.DATEOFCOMMING is NOT NULL)", idtask);
+                        OdbcCommand comSelId = new OdbcCommand(sql, conn);
+                        comSelId.Connection.Open();
+                        try
+                        {
+
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+            }
+
+
             using (OdbcConnection conn = GetConnection())
             {
                 try
                 {
                     conn.Open();
-                    string sql = String.Format("SELECT T1.* FROM DB2ADMIN.TASKS as T1 WHERE (TIMESTAMP(T1.DATEOFCOMMING)>='{0}')AND(TIMESTAMP(T1.DATEOFCOMMING)<'{1}')AND(T1.ID_DEPARTMENT={2})", start, finish, department);
+                    
                     OdbcCommand comGetTasks = new OdbcCommand(sql, conn);
                     try
                     {
@@ -72,19 +95,20 @@ namespace DataMiner2
                                 list.Add(task);
                             }
                         }
-                    }catch(Exception e)
+                    }
+                    catch (Exception e)
                     {
                         Log.we(DateTime.Now, "Выполнение запроса в ПФР<TASKS>", e.Message);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Log.we(DateTime.Now, "Соединение с БД ПФР", e.Message);
 
                 }
             }
-            Log.wi(DateTime.Now, "Выборка данных в ПФР<TASKS>", String.Format("В период {0} по {1} найдено {2}",start,finish,list.Count()));
-            return list;
+            Log.wi(DateTime.Now, "Выборка данных в ПФР<TASKS>", String.Format("В период {0} по {1} найдено {2}", start, finish, list.Count()));
+            return lstTask;
         }
     }
 }
