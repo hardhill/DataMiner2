@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorLog.cs" />
     <Compile Include="IcContext.cs" />
     <Compile Include="INIManager.cs" />
     <Compile Include="Log.cs" />

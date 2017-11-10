@@ -17,6 +17,8 @@ namespace DataMiner2
             
             List<Task> lstTasks = new List<Task>();
             Params taskParams = new Params();
+            ErrorLog errorLog = ErrorLog.getInstance();
+            
             Log.w("================================== START DataMiner ver. 171103-3 =======================================");
             Log.w(String.Format("Начало программы {0}",DateTime.Now));
             Console.WriteLine("DataMIner 2 ver.20171103-3");
@@ -35,27 +37,39 @@ namespace DataMiner2
             dt = dt > taskParams.StartDateTime ? taskParams.StartDateTime : dt;
             // выборка TASKS из ПФР
             List<Task> newTask = wfContext.GetDeltaTasks(dt, taskParams.Delta, taskParams.Department);
-            // подсчитываем результат выборки из БД "ЗАДАЧИ"
-            if (newTask.Count() > 0)
-            {//здесь данные пойдут в БД Инфоцентр
-                IcContext icContext = new IcContext(taskParams.MySQLConnectionString);
-
-                if (icContext.SetTasks(newTask) > 0)
-                {//что-то удалось добавить в БД TASKS Инфоцентра
-                    //последнюю запись в БД читаем и передаем дату в параметры
-                    DateTime d = icContext.GetLastDate();
-                  taskParams.StartDateTime = d>taskParams.StartDateTime?d:taskParams.StartDateTime;
-                  
-                }
-                else
-                {// ничего не добавилось
-                   taskParams.StartDateTime = IncrementalDate(taskParams.StartDateTime,taskParams.Delta);
-                }
-
-            }else   //ничего не выбрано в БД ПФР
+            if (!errorLog.HasError())
             {
-                //увеличиваем начальный день отбора данных в ПФР
-                taskParams.StartDateTime = IncrementalDate(taskParams.StartDateTime, taskParams.Delta);
+                // подсчитываем результат выборки из БД "ЗАДАЧИ"
+                if (newTask.Count() > 0)
+                {
+                    //очистить буфер ошибок
+                    errorLog.ClearErr();
+                    //здесь данные пойдут в БД Инфоцентр
+                    IcContext icContext = new IcContext(taskParams.MySQLConnectionString);
+                    if (!errorLog.HasError())
+                    {
+                        if (icContext.SetTasks(newTask) > 0)
+                        {
+                            //очистить буфер ошибок
+                            errorLog.ClearErr();
+                         //что-то удалось добавить в БД TASKS Инфоцентра
+                         //последнюю запись в БД читаем и передаем дату в параметры
+                            DateTime d = icContext.GetLastDate();
+                            taskParams.StartDateTime = d > taskParams.StartDateTime ? d : taskParams.StartDateTime;
+
+                        }
+                        else
+                        {// ничего не добавилось
+                            taskParams.StartDateTime = IncrementalDate(taskParams.StartDateTime, taskParams.Delta);
+                        }
+                    }
+
+                }
+                else   //ничего не выбрано в БД ПФР
+                {
+                    //увеличиваем начальный день отбора данных в ПФР
+                    taskParams.StartDateTime = IncrementalDate(taskParams.StartDateTime, taskParams.Delta);
+                }
             }
 
 //c сохранение параметров

@@ -11,6 +11,8 @@ namespace DataMiner2
     {
         const string DATEFORMAT = "yyyy-MM-dd HH:mm:ss.fff";
         public string ConnectionString { get; set; }
+        ErrorLog errorLog = ErrorLog.getInstance();
+
         public WFContext(string connectionString)
         {
             this.ConnectionString = connectionString;
@@ -75,11 +77,13 @@ namespace DataMiner2
                     }catch(Exception e)
                     {
                         Log.we(DateTime.Now, "Выполнение запроса в ПФР<TASKS>", e.Message);
+                        errorLog.AddError(e.Message);
                     }
                 }
                 catch(Exception e)
                 {
                     Log.we(DateTime.Now, "Соединение с БД ПФР", e.Message);
+                    errorLog.AddError(e.Message);
 
                 }
             }

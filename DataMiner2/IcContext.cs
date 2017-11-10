@@ -11,6 +11,8 @@ namespace DataMiner2
     {
         const string DATEFORMAT = "yyyy-MM-dd HH:mm:ss.fff";
         public string ConnectionString { get; set; }
+        ErrorLog errorLog = ErrorLog.getInstance();
+
         public IcContext(string connectionString)
         {
             this.ConnectionString = connectionString;
@@ -25,6 +27,7 @@ namespace DataMiner2
             int result = 0;
             string stage_from, stage_to, datecomming, datetaking, datecomplit,typecomplit;
             int AllAdded = 0;
+            
             using (MySqlConnection conn = GetConnection())
             {
                 try
@@ -58,6 +61,7 @@ namespace DataMiner2
                         catch (Exception e)
                         {
                             Log.we(DateTime.Now, "Выполнение команды добавления в БД TASKS. id="+task.Id_task.ToString(), e.Message);
+                            errorLog.AddError(e.Message);
                         }
 
                     }
@@ -68,6 +72,7 @@ namespace DataMiner2
                 catch(Exception e)
                 {
                     Log.we(DateTime.Now, "Соединение с БД Infocenter", e.Message);
+                    errorLog.AddError(e.Message);
                 }
             }
             return AllAdded;
@@ -92,7 +97,7 @@ namespace DataMiner2
                 catch (Exception e)
                 {
                     Log.we(DateTime.Now, "Нахождение последней даты в таблице TASK", e.Message);
-                    
+                    errorLog.AddError(e.Message);
                 }
             }
 

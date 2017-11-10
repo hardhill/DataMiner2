@@ -30,38 +30,13 @@ namespace DataMiner3
                 {
                     try
                     {
-                        string sql = String.Format("SELECT T1.* FROM DB2ADMIN.TASKS as T1 WHERE (T1.ID_TASK = {0})AND(T1.DATEOFCOMMING is NOT NULL)", idtask);
+                        string sql = String.Format("SELECT T1.* FROM DB2ADMIN.TASKS as T1 WHERE (T1.ID_TASK = {0})AND(T1.DATEOFCOMPLATION is NOT NULL)", idtask);
                         OdbcCommand comSelId = new OdbcCommand(sql, conn);
                         comSelId.Connection.Open();
                         try
                         {
-
-                        }
-                        catch (Exception e)
-                        {
-
-                        }
-                    }
-                    catch (Exception e)
-                    {
-
-                    }
-                }
-            }
-
-
-            using (OdbcConnection conn = GetConnection())
-            {
-                try
-                {
-                    conn.Open();
-                    
-                    OdbcCommand comGetTasks = new OdbcCommand(sql, conn);
-                    try
-                    {
-                        using (OdbcDataReader readTask = comGetTasks.ExecuteReader())
-                        {
-                            while (readTask.Read())
+                            OdbcDataReader readTask = comSelId.ExecuteReader();
+                            if (readTask.Read())
                             {
                                 Task task = new Task();
                                 task.Id_task = (readTask.IsDBNull(0)) ? 0 : readTask.GetInt64(0);
@@ -91,23 +66,22 @@ namespace DataMiner3
                                 }
                                 task.Type_complation = readTask.IsDBNull(10) ? 0 : readTask.GetInt32(10);
 
-                                task.Id_department = department;
-                                list.Add(task);
+                                task.Id_department = 35;
+                                lstTask.Add(task);
                             }
+                        }
+                        catch (Exception e)
+                        {
+                            Log.we(DateTime.Now, "Чтение данных БД ПФР<TASKS>", e.Message);
                         }
                     }
                     catch (Exception e)
                     {
-                        Log.we(DateTime.Now, "Выполнение запроса в ПФР<TASKS>", e.Message);
+                        Log.we(DateTime.Now,"Соединение с БД ПФР<TASKS>",e.Message);
                     }
                 }
-                catch (Exception e)
-                {
-                    Log.we(DateTime.Now, "Соединение с БД ПФР", e.Message);
-
-                }
             }
-            Log.wi(DateTime.Now, "Выборка данных в ПФР<TASKS>", String.Format("В период {0} по {1} найдено {2}", start, finish, list.Count()));
+            
             return lstTask;
         }
     }
